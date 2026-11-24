@@ -1,0 +1,39 @@
+---
+import { Image } from "emdash/ui";
+import { formatDate, snippet } from "../utils/format";
+
+interface Props {
+	post: any;
+	category?: { label: string } | null;
+}
+
+const { post, category } = Astro.props;
+const excerpt = post.data.excerpt || snippet(post.data.content);
+---
+
+<a href={`/posts/${post.id}`} class="e-card">
+	<figure class="e-card-thumb">
+		{
+			post.data.featured_image && (
+				<div {...post.edit.featured_image}>
+					<Image image={post.data.featured_image} />
+				</div>
+			)
+		}
+		{category && <span class="cat-label">{category.label}</span>}
+	</figure>
+	<div class="e-card-content">
+		<h2 class="e-card-title" {...post.edit.title}>{post.data.title}</h2>
+		{excerpt && <div class="e-card-snippet">{excerpt}</div>}
+		<div class="e-card-meta">
+			{
+				post.data.publishedAt && (
+					<time datetime={post.data.publishedAt.toISOString()}>
+						{formatDate(post.data.publishedAt)}
+					</time>
+				)
+			}
+			{category && <span class="cat-badge">{category.label}</span>}
+		</div>
+	</div>
+</a>

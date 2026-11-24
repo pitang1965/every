@@ -1,0 +1,18 @@
+---
+import { getOgp } from "../utils/ogp";
+
+interface Props {
+	url: string;
+}
+
+const ogp = await getOgp(Astro.props.url);
+---
+
+<a href={ogp.url} class="blogcard" target="_blank" rel="noopener noreferrer">
+	{ogp.image && <img class="blogcard-thumb" src={ogp.image} alt="" loading="lazy" />}
+	<div class="blogcard-content">
+		<div class="blogcard-title">{ogp.title}</div>
+		{ogp.description && <div class="blogcard-snippet">{ogp.description}</div>}
+		<div class="blogcard-site">{ogp.host}</div>
+	</div>
+</a>

@@ -1,0 +1,39 @@
+---
+import { HtmlBlock } from "emdash/ui";
+import LinkCard from "./LinkCard.astro";
+
+const { node } = Astro.props;
+const html: string = node?.html?.trim() ?? "";
+// WordPress (Cocoon) のブログカードは「URL だけの行」として htmlBlock に取り込まれている
+const url = html.match(/^https?:\/\/\S+$/)?.[0];
+
+// EmDash の HTML サニタイズは YouTube/Vimeo 以外の iframe の src を消すので、Google マップだけ自前で描画する
+let mapSrc: string | null = null;
+const iframeSrc = html.match(/^<iframe\s[^>]*src="([^"]+)"[^>]*>\s*<\/iframe>$/i)?.[1];
+if (iframeSrc) {
+	try {
+		const u = new URL(iframeSrc.replaceAll("&amp;", "&"));
+		if (u.protocol === "https:" && u.hostname === "www.google.com" && u.pathname.startsWith("/maps/embed")) {
+			mapSrc = u.href;
+		}
+	} catch {}
+}
+---
+
+{
+	url ? (
+		<LinkCard url={url} />
+	) : mapSrc ? (
+		<div class="map-embed">
+			<iframe
+				src={mapSrc}
+				title="Google マップ"
+				loading="lazy"
+				referrerpolicy="no-referrer-when-downgrade"
+				allowfullscreen
+			/>
+		</div>
+	) : (
+		<HtmlBlock node={node} />
+	)
+}

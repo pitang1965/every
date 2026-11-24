@@ -4,6 +4,7 @@ import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from "emdash/ui";
 import { createPublicPageContext } from "emdash/page";
 import LiveSearch from "emdash/ui/search";
 import { resolveStarterSiteIdentity } from "../utils/site-identity";
+import Promo from "../components/Promo.astro";
 
 interface Props {
 	title: string;
@@ -52,50 +53,218 @@ const pageCtx = createPublicPageContext({
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="ja">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{fullTitle}</title>
+		<link rel="icon" href="/favicon-32.png" sizes="32x32" />
+		<link rel="icon" href="/icon-192.png" sizes="192x192" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		<EmDashHead page={pageCtx} />
 	</head>
 	<body>
 		<EmDashBodyStart page={pageCtx} />
 
-		<header>
-			<nav>
-				<a href="/">
+		<header class="header">
+			<div class="wrap header-in">
+				<div class="tagline">{siteTagline}</div>
+				<a href="/" class="site-name">
 					{
 						siteLogo ? (
 							<img
 								src={siteLogo.url}
 								alt={siteLogo.alt || siteTitle}
-								style="height:48px;width:auto;margin:-8px 0;display:block;"
+								style="height:48px;width:auto;display:inline-block;"
 							/>
 						) : (
 							siteTitle
 						)
 					}
 				</a>
-				{
-					menu?.items.map((item) => (
-						<a
-							href={item.url}
-							target={item.target}
-							rel={item.target === "_blank" ? "noopener noreferrer" : undefined}
-						>
-							{item.label}
-						</a>
-					))
-				}
-				<LiveSearch placeholder="Search..." collections={["posts", "pages"]} />
+			</div>
+			<nav class="navi" aria-label="ヘッダーメニュー">
+				<div class="wrap navi-in">
+					{
+						menu?.items.map((item) => (
+							<a
+								href={item.url}
+								target={item.target}
+								rel={item.target === "_blank" ? "noopener noreferrer" : undefined}
+							>
+								{item.label}
+							</a>
+						))
+					}
+					<LiveSearch placeholder="サイト内を検索" collections={["posts", "pages"]} />
+				</div>
 			</nav>
 		</header>
 
-		<main>
-			<slot />
-		</main>
+		<div class="wrap content">
+			<Promo />
+			<main class="main">
+				<slot />
+			</main>
+		</div>
+
+		<footer class="footer">
+			<div class="wrap footer-in">
+				<a href="/" class="site-name">{siteTitle}</a>
+				<div class="copyright">© 2023 {siteTitle}.</div>
+			</div>
+		</footer>
 
 		<EmDashBodyEnd page={pageCtx} />
 	</body>
 </html>
+
+<style is:global>
+	/* WordPress テーマ Cocoon の初期デザインに寄せたスタイル */
+	:root {
+		--text: #333;
+		--pallid: #777;
+		--thin: #ddd;
+		--xx-thin: #f5f6f7;
+		--link: #1967d2;
+		--link-hover: #e53900;
+	}
+	* { box-sizing: border-box; }
+	body {
+		margin: 0;
+		font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+		font-size: 18px;
+		line-height: 1.8;
+		color: var(--text);
+		background-color: #f4f5f7;
+		overflow-wrap: break-word;
+	}
+	a { color: var(--link); }
+	a:hover { color: var(--link-hover); }
+	img { max-width: 100%; height: auto; }
+	.wrap { max-width: 1256px; margin: 0 auto; }
+
+	/* ヘッダー：キャッチフレーズの下にサイト名を中央表示 */
+	.header, .navi, .main, .footer { background-color: #fff; }
+	.header-in { text-align: center; padding: 0.6em 1em 1.2em; }
+	.tagline { font-size: 14px; margin: 0.6em 0; }
+	.site-name { font-size: 28px; font-weight: bold; color: var(--text); text-decoration: none; }
+	.site-name:hover { color: var(--text); }
+	.navi-in { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0 1.5em; padding: 0 1em; }
+	.navi-in > a { color: var(--text); text-decoration: none; padding: 0.6em 0; font-size: 16px; }
+	.navi-in > a:hover { background-color: #f5f8fa; }
+
+	/* 本文エリア */
+	.content { margin-top: 24px; }
+	.main { padding: 36px 29px; }
+	.main > h1, .entry-title { font-size: 26px; line-height: 1.25; margin: 16px 0; }
+
+	/* 記事カード：左にサムネイル、右にタイトル・抜粋 */
+	.e-card {
+		display: flex;
+		gap: 10px;
+		padding: 1.5%;
+		margin-bottom: 1em;
+		color: var(--text);
+		text-decoration: none;
+	}
+	.e-card:hover { color: var(--text); background-color: #f5f8fa; transition: background-color 0.3s ease-in-out; }
+	.e-card-thumb { position: relative; flex: 0 0 320px; margin: 0; }
+	.e-card-thumb img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+	.cat-label {
+		position: absolute; top: 0.24em; left: 0.24em;
+		border: 1px solid #eee; font-size: 10px; color: #fff;
+		background-color: rgba(51, 51, 51, 0.7); padding: 1px 5px;
+		max-width: 70%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+	}
+	.e-card-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+	.e-card-title { font-size: 18px; line-height: 1.6; margin: 0 0 0.4em; }
+	.e-card-snippet { font-size: 13px; line-height: 1.6; color: #555; flex: 1; }
+	.e-card-meta { display: flex; justify-content: flex-end; align-items: center; gap: 8px; font-size: 13px; color: var(--pallid); margin-top: 0.5em; }
+	.cat-badge, .tax-link {
+		display: inline-block; padding: 2px 6px; font-size: 12px; line-height: 1.6;
+		color: #fff; background-color: var(--text); border-radius: 2px; text-decoration: none;
+	}
+	.tax-link:hover { color: #fff; opacity: 0.8; }
+	.tax-links { display: flex; flex-wrap: wrap; gap: 5px; margin: 18px 0; }
+
+	/* 記事本文 */
+	.eye-catch { position: relative; margin: 0 0 0.6em; }
+	.eye-catch img { display: block; width: 100%; }
+	.eye-catch .cat-label { top: 0.4em; left: 0.4em; font-size: 14px; }
+	.date-tags { text-align: right; font-size: 14px; color: var(--pallid); margin-bottom: 1em; }
+	.article :is(p, ul, ol, figure, blockquote, table) { margin: 0 0 1.8em; }
+	.article :is(h1, h2, h3, h4, h5, h6) { line-height: 1.25; font-weight: bold; margin: 0 0 1.62em; }
+	.entry-content h1 { font-size: 28px; }
+	.entry-content h2 { font-size: 24px; padding: 25px; background-color: var(--xx-thin); border-radius: 2px; }
+	.entry-content h3 { font-size: 22px; padding: 12px 20px; border: 1px solid var(--thin); border-left: 7px solid #888; }
+	.entry-content :is(h4, h5, h6) { font-size: 20px; padding: 9px 10px; }
+	.entry-content h4 { border-top: 2px solid var(--thin); border-bottom: 2px solid var(--thin); }
+	.entry-content figure img { display: block; margin: 0 auto; }
+	.entry-content figcaption { text-align: center; font-size: 14px; color: var(--pallid); }
+	.entry-content iframe { max-width: 100%; }
+
+	/* ブログカード（Cocoon 風のリンクカード） */
+	.blogcard {
+		display: flex; gap: 2%; margin: 0 0 1.8em; padding: 1.6% 2.2%;
+		border: 1px solid var(--thin); border-radius: 4px;
+		color: var(--text); text-decoration: none; line-height: 1.6;
+	}
+	.blogcard:hover { color: var(--text); background-color: #f5f8fa; }
+	.blogcard-thumb { flex: 0 0 160px; width: 160px; aspect-ratio: 16 / 9; object-fit: cover; }
+	.blogcard-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+	.blogcard-title { font-weight: bold; font-size: 0.95em; overflow-wrap: anywhere; }
+	.blogcard-snippet { font-size: 0.75em; color: #555; margin-top: 0.3em; }
+	.blogcard-site { font-size: 0.7em; color: var(--pallid); margin-top: auto; padding-top: 0.3em; text-align: right; }
+	@media screen and (max-width: 480px) {
+		.blogcard { gap: 10px; padding: 10px; }
+		.blogcard-thumb { flex-basis: 96px; width: 96px; align-self: flex-start; }
+		.blogcard-title { font-size: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+		.blogcard-snippet { display: none; }
+		.blogcard-site { font-size: 11px; }
+	}
+
+	/* Google マップ埋め込み */
+	.map-embed { margin: 0 0 1.8em; }
+	.map-embed iframe { display: block; width: 100%; aspect-ratio: 4 / 3; border: 0; }
+
+	/* 宣伝枠（全ページの本文上）：PC は左右2列、モバイルは上下 */
+	.promo { background-color: #fff; margin-bottom: 20px; padding: 16px 29px; }
+	.promo-title { font-size: 16px; margin: 0 0 12px; padding-left: 10px; border-left: 5px solid #19448e; line-height: 1.4; }
+	.promo-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+	.promo-cards .blogcard { margin: 0; }
+	@media screen and (max-width: 834px) {
+		.promo { padding: 12px 16px; margin-bottom: 12px; }
+		.promo-cards { grid-template-columns: 1fr; gap: 10px; }
+	}
+
+	/* ページ送り */
+	.pagination { display: flex; justify-content: center; gap: 1em; margin: 24px 0; }
+	.pagination a { border: 1px solid var(--thin); padding: 0.4em 1em; text-decoration: none; color: var(--text); }
+	.pagination a:hover { background-color: #eee; }
+
+	/* フッター */
+	.footer { margin-top: 20px; padding: 32px 8px 16px; text-align: center; font-size: 14px; }
+	.copyright { margin-top: 8px; }
+
+	@media screen and (max-width: 834px) {
+		.content { margin-top: 12px; }
+		.main { padding: 16px; }
+		.e-card { padding: 8px 0; gap: 12px; border-bottom: 1px solid var(--x-thin, #eee); margin-bottom: 0; }
+		.e-card-thumb { flex-basis: 38%; align-self: flex-start; }
+		.e-card-snippet { display: none; }
+	}
+	@media screen and (max-width: 480px) {
+		body { font-size: 16px; }
+		.site-name { font-size: 22px; }
+		.tagline { font-size: 12px; }
+		.e-card-title { font-size: 15px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+		.e-card-meta { font-size: 12px; }
+		.cat-badge { display: none; }
+		.entry-title { font-size: 22px; }
+		.entry-content h1 { font-size: 22px; }
+		.entry-content h2 { font-size: 20px; padding: 14px 16px; }
+		.entry-content h3 { font-size: 18px; padding: 10px 14px; }
+		.map-embed iframe { aspect-ratio: 1 / 1; }
+	}
+</style>

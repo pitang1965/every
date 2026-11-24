@@ -1,0 +1,24 @@
+---
+import { Block } from "emdash/ui";
+import type { ComponentProps } from "astro/types";
+import LinkCard from "./LinkCard.astro";
+
+type Props = ComponentProps<typeof Block>;
+
+const { node } = Astro.props;
+// Cocoon と同じく、URL だけの段落（リンク付きでも）はブログカードにする
+// children は描画前にマーク（リンク等）ごとの入れ子に変換されているので再帰でテキストを集める
+const plain = (n: any): string => n.text ?? (n.children ?? []).map(plain).join("");
+const text = node?.style === "normal" ? plain(node).trim() : "";
+const url = text.match(/^https?:\/\/\S+$/)?.[0];
+---
+
+{
+	url ? (
+		<LinkCard url={url} />
+	) : (
+		<Block {...Astro.props}>
+			<slot />
+		</Block>
+	)
+}

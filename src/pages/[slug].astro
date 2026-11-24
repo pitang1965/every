@@ -2,6 +2,7 @@
 import { getEmDashEntry, getSeoMeta, decodeSlug, getSiteSettings } from "emdash";
 import { PortableText } from "emdash/ui";
 import Base from "../layouts/Base.astro";
+import { contentComponents } from "../components/portable-text";
 import { resolveStarterSiteIdentity } from "../utils/site-identity";
 
 const slug = decodeSlug(Astro.params.slug);
@@ -33,9 +34,14 @@ const seo = getSeoMeta(page, {
 	canonical={seo.canonical}
 	content={{ collection: "pages", id: page.data.id, slug }}
 >
-	<article>
-		<h1 {...page.edit.title}>{page.data.title}</h1>
+	<article class="article">
+		<h1 class="entry-title" {...page.edit.title}>{page.data.title}</h1>
 
-		<PortableText value={page.data.content} />
+		<div class="entry-content">
+			<PortableText
+				value={page.data.content}
+				components={contentComponents}
+			/>
+		</div>
 	</article>
 </Base>
