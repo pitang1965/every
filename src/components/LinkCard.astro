@@ -1,11 +1,13 @@
 ---
-import { getOgp } from "../utils/ogp";
+import { getOgp, type Ogp } from "../utils/ogp";
 
 interface Props {
 	url: string;
+	/** 内容が決まっているカードは渡せば外部取得しない */
+	ogp?: Ogp;
 }
 
-const ogp = await getOgp(Astro.props.url);
+const ogp = Astro.props.ogp ?? (await getOgp(Astro.props.url));
 ---
 
 <a href={ogp.url} class="blogcard" target="_blank" rel="noopener noreferrer">

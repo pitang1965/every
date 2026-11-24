@@ -1,11 +1,31 @@
 ---
 import LinkCard from "./LinkCard.astro";
+
+// 全ページに出るので外部取得せず固定値にする（Google Play のページは約1MBで、毎回の取得は CPU 上限を超える）
+const cards = [
+	{
+		url: "https://tabi.over40web.club/shachu-haku",
+		host: "tabi.over40web.club",
+		title: "全国車中泊マップ | 車旅のしおり",
+		description:
+			"全国の車中泊スポットを検索・閲覧できます。道の駅、SA・PA、RVパークなど様々な種類のスポットの詳細情報、料金、設備、周辺施設などをご確認いただけます。",
+		image: "https://tabi.over40web.club/shachu-haku.webp",
+	},
+	{
+		url: "https://play.google.com/store/apps/details?id=club.over40web.tabi.spots&hl=ja",
+		host: "play.google.com",
+		title: "車中泊スポットマップ｜車旅のしおり - Google Play のアプリ",
+		description:
+			"全国2,000カ所以上の車中泊スポットを、現在地から近い順に地図と一覧で検索。道の駅・RVパーク・温泉などを、旅先ですばやく探せます。",
+		image:
+			"https://play-lh.googleusercontent.com/fxReOZMqcG8nu_aQPzIy_SXTkeafoH0Xz0YyBkCLKNtJJ2vDT-CIDT3UQGNl8RcsYMgNZZx_P1AE1wD88DL8Zg=s0-br30",
+	},
+];
 ---
 
 <aside class="promo" aria-labelledby="promo-title">
 	<h2 id="promo-title" class="promo-title">車中泊スポットを探すなら</h2>
 	<div class="promo-cards">
-		<LinkCard url="https://tabi.over40web.club/shachu-haku" />
-		<LinkCard url="https://play.google.com/store/apps/details?id=club.over40web.tabi.spots&hl=ja" />
+		{cards.map((c) => <LinkCard url={c.url} ogp={c} />)}
 	</div>
 </aside>
